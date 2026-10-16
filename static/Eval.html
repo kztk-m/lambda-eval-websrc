@@ -7,6 +7,7 @@
 </head>
 <body>
   <h1>&lambda;-term Evaluator</h1>
+  <p class="lead-in">This page demonstrates β-reduction in the untyped λ-calculus. Type a term in the "Term" textbox below and press "Reduce" to see how the term gets to a normal form by repeated reductions. The leftmost outermost redexes are always chosen by the system (normal-order reduction); if a term has a normal form, this strategy is known to terminate. For λ abstractions, as well as <code>λx. M</code>, this system permits OCaml or Haskell syntax (<code>fun x -&gt; M</code> or <code>\x -&gt; M</code>), or their mixtures (<code>fun x. M</code> or <code>\x. M</code>).</p>
   <div id="app"></div>
   <script>Elm.Main.init({ node: document.getElementById('app') });</script>
 </body>

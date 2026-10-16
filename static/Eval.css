@@ -1,11 +1,31 @@
 :root {
     /* --redex-bg: #feeac9; */
-    --result-bg: oklab(98% -0.00027 -0.00297);
-    --redex-bg: oklab(94% 0.00813 0.04754);
+    /* --result-bg: oklab(98% -0.00027 -0.00297);
+    --highlight-line-bg: oklab(95% -0.00027 -0.00297); */
+    /* --redex-bg: oklch(93.872% 0.0483 80.298); */
     /* --highlight-line-bg: rgb(255, 235, 176); f6f7f9 */
-    --highlight-line-bg: oklab(95% -0.00027 -0.00297);
     --parens-bg: rgb(255, 215, 215);
+
+    --accent: #2a5db0;
+    --border: #868b94;
+    --error: #b3261e;
+
+
+    --paren-hl: var(--accent);
+    --redex-bg: oklch(0.92 0.035 210);
+    --redex-bg-hl: oklch(0.89 0.05 210);
+    --redex-fun: oklch(from var(--accent) l calc(c + 0.05) 320);
+    --redex-arg: oklch(from var(--accent) calc(l - 0.05) calc(c - 0.1) 145);
+
+    --result-bg: oklch(from #00F 0.975 0.01 calc(h - 10));
+    --highlight-line-bg: oklch(from #00F 0.94 0.02 calc(h - 10));
+
+    --button-main: oklch(46.924% 0.2555 264.283);
+    --gap: 1.5rem;
+    --inner-gap: 0.65rem;
 }
+
+
 
 body {
     font-family: system-ui, sans-serif;
@@ -28,13 +48,93 @@ input.exp_input,
     font-family: ui-monospace, Menlo, Consolas, "Source Code Pro", monospace;
 }
 
+p.lead-in {
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: var(--gap);
+}
+
+
+textarea {
+    resize: vertical;
+}
+
+textarea:focus-visible,
+input.exp_input:focus-visible {
+    border-color: var(--accent);
+    outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    outline-offset: 0;
+}
+
+textarea,
+input.exp_input,
+button,
+.d_error,
+.e_error {
+    /* font-size: 0.8125rem; */
+    font-size: 0.875rem;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+
+textarea,
+input[type="text"] {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+    border-radius: 0.45em;
+    padding: 0.45em 0.6em;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+button {
+    border-radius: 0.45em;
+    padding: 0.45em 1.1em;
+
+    color: white;
+    background-color: var(--button-main);
+    border-style: none;
+}
+
+button:hover {
+    background-color: oklch(from var(--button-main) calc(l + 0.1) c h);
+    box-shadow: 0 0 0.2rem 0.3rem oklch(from var(--button-main) calc(l * 0.2) c h / 0.05);
+}
+
+button.reset {
+    color: var(--button-main);
+    background-color: transparent;
+}
+
+button.reset:hover {
+    outline-color: var(--button-main);
+    outline-width: 1px;
+    outline-style: solid;
+}
+
+textarea[aria-invalid="true"],
+input.exp_input[aria-invalid="true"] {
+    border-color: var(--error);
+}
+
+textarea[aria-invalid="true"]:focus-visible,
+input.exp_input[aria-invalid="true"]:focus-visible {
+    outline-color: color-mix(in srgb, var(--error) 35%, transparent);
+}
+
 div.block {
     contain: content;
 }
 
 h1 {
-    margin-top: 0;
-    margin-bottom: 0.75rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.25rem;
 }
 
 
@@ -48,21 +148,22 @@ h1 {
 }
 
 .redex .fun {
-    color: #c0392b;
+    color: var(--redex-fun);
 }
 
 .redex .arg {
-    color: #2a5db0;
+    color: var(--redex-arg);
 }
 
-span.paren:hover:not(:has(span.paren:hover)) {
-    /* background-color: var(--parens-bg); */
-}
+/* span.paren:hover:not(:has(span.paren:hover)) {
+    background-color: var(--parens-bg);
+} */
 
 span.paren:hover:not(:has(span.paren:hover))>span.lp,
 span.paren:hover:not(:has(span.paren:hover))>span.rp {
-    color: #F00;
-    font-weight: bold;
+    color: var(--paren-hl);
+    /* font-weight: bold; */
+    background-color: oklch(from var(--paren-hl) l c h / 0.2);
 }
 
 .result .line {
@@ -72,8 +173,8 @@ span.paren:hover:not(:has(span.paren:hover))>span.rp {
 .line {
     padding-top: 0.3em;
     padding-bottom: 0.4em;
-    padding-left: 2em;
-    padding-right: 0.5em;
+    padding-left: 2.1em;
+    padding-right: 0.6em;
     text-indent: -1.5em;
 }
 
@@ -97,7 +198,7 @@ div.line:hover {
 
 div.line:hover .redex {
     /* background-color: #F00; */
-    background-color: color-mix(in srgb, var(--highlight-line-bg) 20%, var(--redex-bg));
+    background-color: var(--redex-bg-hl);
 }
 
 body {
@@ -105,6 +206,13 @@ body {
     flex-direction: column;
     height: calc(100vh - 1em);
     margin: 0.5em 1rem;
+}
+
+@media screen and (width >=600px) {
+    body {
+        margin-left: max(5rem, 5vw);
+        margin-right: max(5rem, 5vw);
+    }
 }
 
 .app {
@@ -121,7 +229,7 @@ body {
 }
 
 .d {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--inner-gap);
 }
 
 .d textarea {
@@ -138,6 +246,10 @@ body {
 .e input {
     flex: 1;
     min-width: 0;
+}
+
+.e button.reset {
+    margin-left: 0.5rem;
 }
 
 .d_error,
@@ -172,11 +284,11 @@ body {
 .result {
     flex: 1;
     overflow: auto;
-    margin-top: 0.75rem;
+    margin-top: var(--gap);
     padding: 0.5em 0;
     background-color: var(--result-bg);
 
-    border-radius: 0.4rem;
+    /* border-radius: 0.4rem; */
     /* border-color: #ddd;
     border-style: solid;
     border-width: 0.1rem; */

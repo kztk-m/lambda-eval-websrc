@@ -111,6 +111,14 @@ renderContext cs k =
     in 
     goFrames 0 cs k 
 
+isOk : Result e a -> Bool 
+isOk x = case x of
+    Ok _ -> True 
+    Err _ -> False 
+
+viewBool : Bool -> String
+viewBool b = if b then "true" else "false"
+
 
 view : Model -> Html Msg 
 view m = 
@@ -120,15 +128,22 @@ view m =
             in 
             H.div [class "control"]
             [
+                H.label [ H.for "decls", class "field-label" ] [H.text "Definitions"], 
                 H.div [class "d"]
-                    [ H.textarea [onInput SetDeclText] [ H.text m.declText ], 
+                    [ H.textarea [ H.id "decls"
+                                 , onInput SetDeclText
+                                 , H.attribute "aria-invalid" <| viewBool <| not (isOk m.parsedDecl) 
+                                 ] [ H.text m.declText ], 
                       d_errorPane ], 
+                H.label [H.for "term", class "field-label" ] [H.text "Term"],
                 Html.form [class "e", onSubmit Start ] [
-                    H.input [ class "exp_input", type_ "text", value m.expText, onInput SetExpText, placeholder "Term to reduce." ] [], 
-                    H.button [ type_ "button", onClick msg, disabled bdisabled] [ 
+                    H.input [ H.id "term", class "exp_input", type_ "text", value m.expText
+                            , H.attribute "aria-invalid" <| viewBool <| not (isOk m.parsedExp || String.isEmpty m.expText)
+                            , onInput SetExpText, placeholder "e.g., '(\\x. x x) (\\x.x)', 'add 1 2', 'sum 2' (quotes are not part of terms)" ] [], 
+                    H.button [ type_ "button", onClick msg, class "run", disabled bdisabled] [ 
                         H.text btext
                     ], 
-                    H.button [ type_ "button", onClick Reset ] [ H.text "Reset" ], 
+                    H.button [ type_ "button", onClick Reset, class "reset" ] [ H.text "Reset" ], 
                     e_errorPane
                 ]
             ]
@@ -226,7 +241,10 @@ init = (initModel , Cmd.none)
 
 initDecls : String 
 initDecls = 
-    """K = \\x.\\y. x;
+    """-- name = term; 
+-- Defined names can be used in the following definitions and the Term field.
+-- Recursive definitions are not allowed.
+K = \\x.\\y. x;
 S = \\x y z. x z (y z);
 I = \\x. x;
 Omega = (\\x. x x) (\\x. x x);
@@ -245,8 +263,7 @@ iszero = \\n. n (\\x. false) true;
 
 sum   = Y (\\f n. iszero n 0 (add n (f (pred n))));
 sum'  = \\n. n (\\p. p (\\x y k. k (succ x) (add (succ x) y))) (\\k. k 0 0) false;
-sum'' = \\n s z. n (\\p. p (\\x y k. k (\\z. s (x z)) (s (x y)))) (\\k. k I z) false;
-"""
+sum'' = \\n s z. n (\\p. p (\\x y k. k (\\z. s (x z)) (s (x y)))) (\\k. k I z) false;"""
 
 initModel : Model 
 initModel = 
