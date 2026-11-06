@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 
 import Parser
 import Parser exposing (Parser, (|=), (|.))
+import Parser.Advanced as A 
 
 type Name = Name String | HOLE | IName Int 
 
@@ -358,6 +359,33 @@ pAtomicExpLoop =
                 ]
     in Parser.loop [] p 
 
+-- Currently, Parser.int accidentally consumes "e" and ".". 
+-- https://github.com/elm/parser/issues/28
+-- https://github.com/elm/parser/issues/14
+-- https://github.com/elm/parser/issues/25
+-- Thus, we need to prepare our own version. 
+pInt : Parser Int 
+pInt = 
+    let 
+        -- one or more digits 
+        chomper =
+            Parser.succeed () 
+            |. Parser.chompIf Char.isDigit 
+            |. Parser.chompWhile Char.isDigit
+
+        checkInt str = 
+            -- Report errors for strings like "0123"
+            if String.startsWith "0" str && String.length str /= 1 then 
+                A.problem Parser.ExpectingInt
+            else 
+                case String.toInt str of 
+                    Just n -> Parser.succeed n 
+                    Nothing -> A.problem Parser.ExpectingInt
+    in 
+    Parser.getChompedString chomper
+    |> Parser.andThen checkInt 
+
+
 pName : Parser Name
 pName = 
     Parser.succeed Name 
@@ -391,7 +419,7 @@ pAtomicExp =
         |. Parser.symbol ")"
         |. sp, 
         Parser.succeed makeChurchNumeral 
-        |= Parser.int 
+        |= pInt -- see the comment for pInt above.
         |. sp , 
         Parser.succeed var 
         |= pName 
